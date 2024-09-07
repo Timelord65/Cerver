@@ -1,6 +1,21 @@
-run:
-	gcc main.c -o bin/main.out
-	./bin/main.out
+# Variables
+CC = gcc
+SRC = main.c
+BIN_DIR = bin
+BIN = $(BIN_DIR)/main.out
+CFLAGS = -Wall -pthread
 
-build: 
-	gcc main.c -o bin/main.out
+.PHONY: all run build clean
+
+all: build
+
+build:
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(SRC) -o $(BIN) $(CFLAGS)
+
+run: build
+	./$(BIN)
+
+clean:
+	rm -rf $(BIN_DIR)
+
