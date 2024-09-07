@@ -1,2 +1,38 @@
 <title>CERVER PAGE</title>
-<h1>Your server is working. Don't worry buddy</h1>
+<h1>Cerver: Simple Multithreaded HTTP Server in C</h1>
+<p>This project is a simple multithreaded HTTP server implemented in C. It handles incoming HTTP requests by spawning a new thread for each client connection and serves static files from a specified directory. The server is designed to handle basic HTTP GET requests and serve HTML files.</p>
+<h2>Features</h2>
+<ul>
+<li>Multithreaded: Each client connection is handled in a separate thread, allowing for concurrent processing of multiple requests.</li>
+<li>HTTP 1.1 Support: Basic HTTP 1.1 protocol implementation.</li>
+<li>Static File Serving: Serves static files (e.g., HTML files) from a local directory.</li>
+<li>Graceful Shutdown: Handles <code>SIGINT</code> signal (Ctrl+C) for shutting down the server cleanly.</li>
+<li>Logging: Logs important events, such as server startup, connection handling, and errors, with timestamps.</li>
+</ul>
+<h2>Getting Started</h2>
+<h3>Prerequisites</h3>
+<ul>
+<li><strong>GCC</strong>: You need GCC installed to compile the C code.</li>
+<li><strong>POSIX Environment</strong>: The code relies on POSIX system calls, so it should be run on Linux or macOS.</li>
+</ul>
+<h3>Building the Project</h3>
+<p>To build the project, simply use the provided <code>Makefile</code>:</p>
+<p><code>bash
+make build</code></p>
+<h3>Running the Server</h3>
+<p>To run the server, simple use the run command from the Makefile:</p>
+<p><code>bash
+make run</code></p>
+<ul>
+<li>The server will start listening on localhost:8080. You can hit this endpoint using something like curl or wget.</li>
+<li>The index.html file can be altered to suit your needs to serve the concerned static content.</li>
+</ul>
+<h3>Closing the server</h3>
+<p>The server handles shutdown via SIGINT which is done by pressing Ctrl+C and exits cleanly.</p>
+<h2>Known Limitations</h2>
+<ul>
+<li>No MIME Type handling</li>
+<li>No Request Validation</li>
+<li>No Security Features</li>
+<li>Limited to a Single File (index.html) regardless of the requests</li>
+</ul>
