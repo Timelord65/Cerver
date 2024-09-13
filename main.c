@@ -14,8 +14,15 @@
 
 #define INFO "Information Logging \n"
 #define ERR "Error Logging \n"
+#define DEFAULT_STATIC_PATH "./static/index.html"
 
 int socket_fd;
+
+struct connection_info {
+  int socket_fd;
+  int *client_fd;
+  const char *path;
+};
 
 void print_message(char *type, char *message) {
   time_t t = time(NULL);
@@ -34,7 +41,12 @@ void handle_sigint(int signal) {
   exit(0);
 }
 
-void *handle_connection(void *client_fd_ptr) {
+void *handle_connection(void *data) {
+  struct connection_info *info = data;
+
+  int *client_fd_ptr = info->client_fd;
+  int socket_fd = info->socket_fd;
+  const char *path = info->path;
   char buffer[256] = {0};
   int client_fd = *(int *)client_fd_ptr;
   free(client_fd_ptr);
@@ -44,7 +56,7 @@ void *handle_connection(void *client_fd_ptr) {
    */
   recv(client_fd, buffer, 256, 0);
 
-  int open_fd = open("./static/index.html", O_RDONLY);
+  int open_fd = open(path, O_RDONLY);
 
   struct stat file_stat;
   if (fstat(open_fd, &file_stat) < 0) {
@@ -75,12 +87,19 @@ void *handle_connection(void *client_fd_ptr) {
   return NULL;
 }
 
-int main() {
+int main(int argc, char **argv) {
 
   signal(SIGINT, handle_sigint);
 
-  const char *STATIC_PATH = "./static/";
+  char *STATIC_PATH;
+
+  if (argc > 1) {
+    STATIC_PATH = argv[1];
+  } else {
+    STATIC_PATH = DEFAULT_STATIC_PATH;
+  }
   print_message(INFO, "Starting Server Execution");
+  printf("Value of STATIC_PATH: %s", STATIC_PATH);
 
   socket_fd = socket(AF_INET, SOCK_STREAM, 0);
 
@@ -119,12 +138,19 @@ int main() {
       continue;
     }
 
+    struct connection_info *info =
+        (void *)malloc(sizeof(struct connection_info));
+
+    info->socket_fd = socket_fd;
+    info->client_fd = client_fd;
+    info->path = STATIC_PATH;
+
     pthread_t thread_id;
     int thread_create_ret =
-        pthread_create(&thread_id, NULL, handle_connection, client_fd);
+        pthread_create(&thread_id, NULL, handle_connection, info);
 
     if (thread_create_ret != 0) {
-      print_message(ERR, "Thread cration failed");
+      print_message(ERR, "Thread creation failed");
       close(*client_fd);
       free(client_fd);
       continue;
